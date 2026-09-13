@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Machine Downtime Tracking System</title>
+<style>
+:root{--bg:#f4f6f7;--panel:#fff;--text:#172127;--muted:#74818a;--line:#e3e8eb;--accent:#12677f;--accent2:#e9f3f5;--danger:#c94c4c;--warn:#c28a24;--ok:#3d8660;--nav:#18252b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{display:flex;min-height:100vh}.sidebar{width:245px;background:var(--nav);color:#fff;padding:22px 14px;position:fixed;inset:0 auto 0 0;z-index:10}.logo{font-weight:850;padding:0 12px 24px;font-size:16px}.logo small{display:block;color:#9eabb1;font-weight:500;font-size:11px;margin-top:5px;line-height:1.5}
+.nav{display:grid;gap:5px}.nav button{width:100%;background:none;border:0;color:#c8d1d5;text-align:left;padding:12px;border-radius:10px;font:inherit;cursor:pointer}.nav button:hover,.nav button.active{background:#26383f;color:#fff}.nav span{display:inline-block;width:28px}.navsep{height:1px;background:#314149;margin:15px 8px}
+.main{margin-left:245px;width:calc(100% - 245px)}.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:5}.page-title{font-size:20px;font-weight:800}.admin{font-size:13px;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+.content{padding:27px;max-width:1500px;margin:auto}.sub{color:var(--muted);font-size:13px;margin-top:4px}.head{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:20px}h1{font-size:25px;margin:0}
+.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:750;cursor:pointer}.primary{background:var(--accent);color:#fff}.secondary{background:#fff;border:1px solid var(--line);color:var(--text)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}.kpi{font-size:29px;font-weight:850;margin-top:8px}.label{font-size:12px;color:var(--muted)}
+.section{margin-top:22px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:11px;flex-wrap:wrap}.section-title{font-weight:800;font-size:17px}.section-title small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:3px}
+.table{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:13px 15px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{background:#fafbfc;color:var(--muted);font-size:11px}tr:last-child td{border:0}
+.badge{padding:5px 8px;border-radius:99px;font-size:10px;font-weight:800;display:inline-block}.bd{background:#fdeaea;color:#a13d3d}.pm{background:#edf4ff;color:#3765a2}.rg{background:#fff3db;color:#936416}.uf{background:#fff0db;color:#a06616}.ok{background:#e9f6ef;color:#357252}
+.filters{display:flex;gap:7px;flex-wrap:wrap}.filter{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:12px;cursor:pointer}.filter.active{background:var(--accent2);border-color:#bdd6dc;color:var(--accent);font-weight:800}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.rankrow{display:grid;grid-template-columns:35px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.rankrow:last-child{border:0}.empty{text-align:center;padding:30px;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;background:#10202799;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.dialog{width:min(620px,100%);background:#fff;border-radius:17px;padding:23px}.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:11px;color:var(--muted);font-weight:750}.field input,.field select{padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}
+.setting{display:grid;gap:14px}.setting-item{background:#fff;border:1px solid var(--line);border-radius:13px;padding:17px;display:flex;justify-content:space-between;gap:15px;align-items:center}.setting-item b{display:block}.setting-item small{color:var(--muted)}.toggle{width:45px;height:25px;border-radius:20px;background:#d5dde0;position:relative;cursor:pointer}.toggle.on{background:var(--accent)}.toggle:after{content:"";position:absolute;width:19px;height:19px;background:white;border-radius:50%;top:3px;left:3px;transition:.2s}.toggle.on:after{left:23px}
+@media(max-width:850px){.sidebar{width:72px;padding:18px 8px}.logo{font-size:0;text-align:center}.logo:first-letter{font-size:24px}.logo small{display:none}.nav button{font-size:0;text-align:center}.nav span{font-size:20px;width:auto}.main{margin-left:72px;width:calc(100% - 72px)}.cards{grid-template-columns:1fr 1fr}.topbar{padding:0 16px}.content{padding:18px}}@media(max-width:560px){.cards{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.form{grid-template-columns:1fr}.field.full{grid-column:auto}.admin{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">⚙ MACHINE DOWNTIME<small>Tracking System<br>ระบบติดตามเครื่องจักรหยุดทำงาน</small></div>
+  <nav class="nav">
+    <button class="active" onclick="go('dashboard',this)"><span>🏠</span>Dashboard</button>
+    <button onclick="go('machines',this)"><span>⚙️</span>Machines</button>
+    <button onclick="go('downtime',this)"><span>🛑</span>Downtime</button>
+    <button onclick="go('statistics',this)"><span>📊</span>Statistics</button>
+    <button onclick="go('history',this)"><span>📋</span>History</button>
+    <div class="navsep"></div>
+    <button onclick="go('settings',this)"><span>⚙️</span>Settings</button>
+  </nav>
+</aside>
+<div class="main">
+<header class="topbar"><div class="page-title" id="topTitle">Dashboard</div><div class="admin">⚙ ผู้ดูแลระบบ · Admin</div></header>
+<main class="content" id="app"></main>
+</div></div>
+
+<div class="modal" id="modal"><div class="dialog">
+<h2 style="margin-top:0">➕ แจ้งเครื่องจักรมีปัญหา</h2>
+<form onsubmit="addIssue(event)" class="form">
+<div class="field"><label>ชื่อเครื่องจักร</label><input id="machine" required placeholder="Machine 49"></div>
+<div class="field"><label>Line</label><input id="line" required placeholder="SMD1"></div>
+<div class="field"><label>ประเภท</label><select id="type"><option>Breakdown</option><option>PM</option><option>Regeneration</option><option>Other</option></select></div>
+<div class="field"><label>สถานะ</label><select id="status"><option>Stopped</option><option>Underperforming</option></select></div>
+<div class="field full"><label>สาเหตุ</label><input id="reason" required placeholder="ระบุสาเหตุ"></div>
+<div class="field"><label>ผู้แจ้ง</label><input id="reporter" required placeholder="ชื่อผู้แจ้ง"></div>
+<div class="field"><label>ระยะเวลา (นาที)</label><input id="duration" type="number" min="0" value="30" required></div>
+<div class="field full"><label>เครื่องจักร</label><select id="machineStatus"><option value="">ใช้ข้อมูลนี้เป็นเหตุการณ์ Downtime</option></select></div>
+<div class="actions field full"><button type="button" class="btn secondary" onclick="closeModal()">ยกเลิก</button><button class="btn primary">บันทึก</button></div>
+</form></div></div>
+
+<script>
+const KEY='mdts_v2'; let data=JSON.parse(localStorage.getItem(KEY)||'null')||[
+{machine:'Machine 49',line:'SMD1',type:'Breakdown',reason:'Motor Error',status:'Stopped',reporter:'Admin',duration:45,date:new Date().toISOString()},
+{machine:'Bonding AOI',line:'SMD2',type:'PM',reason:'Preventive Maintenance',status:'Stopped',reporter:'Admin',duration:60,date:new Date().toISOString()},
+{machine:'Machine 32',line:'SMD1',type:'Regeneration',reason:'Regeneration Cycle',status:'Stopped',reporter:'Admin',duration:90,date:new Date(Date.now()-86400000).toISOString()},
+{machine:'Machine 18',line:'SMD2',type:'Other',reason:'Low Output',status:'Underperforming',reporter:'Admin',duration:25,date:new Date(Date.now()-172800000).toISOString()}
+];
+let current='dashboard', filter='all', rank='count';
+const $=id=>document.getElementById(id); const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
+function badge(t){let c=t==='Breakdown'?'bd':t==='PM'?'pm':t==='Regeneration'?'rg':t==='Underperforming'?'uf':'ok';return `<span class="badge ${c}">${t}</span>`}
+function sameDay(s){return new Date(s).toDateString()===new Date().toDateString()}
+function filtered(){let n=new Date();return data.filter(x=>filter==='all'||filter==='today'&&sameDay(x.date)||filter==='month'&&(new Date(x.date).getMonth()===n.getMonth()&&new Date(x.date).getFullYear()===n.getFullYear())||filter==='year'&&new Date(x.date).getFullYear()===n.getFullYear())}
+function go(page,btn){current=page;document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render()}
+function openModal(){$('modal').classList.add('show')}
+function closeModal(){$('modal').classList.remove('show')}
+function addIssue(e){e.preventDefault();data.unshift({machine:$('machine').value,line:$('line').value,type:$('type').value,status:$('status').value,reason:$('reason').value,reporter:$('reporter').value,duration:+$('duration').value,date:new Date().toISOString()});save();closeModal();e.target.reset();render()}
+function clearAll(){if(confirm('ยืนยันล้างประวัติทั้งหมด?')){data=[];save();render()}}
+function table(rows,history=false){return rows.length?rows.map(x=>`<tr><td><b>${x.machine}</b></td><td>${x.line}</td><td>${badge(x.type)}</td><td>${x.reason}</td><td>${history?x.duration+' นาที':badge(x.status)}</td><td>${new Date(x.date).toLocaleString('th-TH')}</td><td>${x.reporter}</td></tr>`).join(''):`<tr><td colspan="7" class="empty">ไม่มีข้อมูล</td></tr>`}
+function dashboard(){let stopped=data.filter(x=>x.status==='Stopped'),under=data.filter(x=>x.status==='Underperforming'),today=data.filter(x=>sameDay(x.date)).reduce((a,x)=>a+x.duration,0),month=data.filter(x=>{let d=new Date(x.date),n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()});return `
+<div class="head"><div><h1>Dashboard</h1><div class="sub">ภาพรวมสถานะเครื่องจักรแบบ Real-time จากข้อมูลที่ผู้ใช้งานแจ้ง</div></div><button class="btn primary" onclick="openModal()">➕ แจ้งเครื่องจักรมีปัญหา</button></div>
+<div class="cards">
+<div class="card">🛑<div class="label">เครื่องจักรที่หยุดทำงาน</div><div class="kpi">${stopped.length}</div></div>
+<div class="card">⚠️<div class="label">Running but Underperforming</div><div class="kpi">${under.length}</div></div>
+<div class="card">⏱️<div class="label">Downtime วันนี้</div><div class="kpi">${(today/60).toFixed(1)}h</div></div>
+<div class="card">📋<div class="label">เหตุการณ์เดือนนี้</div><div class="kpi">${month.length}</div></div></div>
+<div class="section"><div class="section-head"><div class="section-title">🛑 เครื่องจักรที่หยุดทำงาน <small>PM และ Regeneration นับรวมเป็น Downtime</small></div><button class="btn secondary" onclick="goByName('downtime')">ดู Downtime ทั้งหมด →</button></div>
+<div class="table"><table><thead><tr><th>เครื่องจักร</th><th>Line</th><th>ประเภท</th><th>สาเหตุ</th><th>สถานะ</th><th>เริ่มหยุด</th><th>ผู้แจ้ง</th></tr></thead><tbody>${table(stopped)}</tbody></table></div></div>
+<div class="section"><div class="section-title">🏆 Top 5 เครื่องหยุดบ่อย</div><div class="grid2">${rankingCard(data)}<div class="card"><b>📌 ประเภท Downtime</b>${typeSummary(data)}</div></div></div>`}
+function rankingCard(rows){let m={};rows.forEach(x=>{m[x.machine]??={count:0,dur:0};m[x.machine].count++;m[x.machine].dur+=x.duration});let a=Object.entries(m).sort((a,b)=>b[1].count-a[1].count).slice(0,5);return `<div class="card">${a.map((x,i)=>`<div class="rankrow"><b>#${i+1}</b><div><b>${x[0]}</b><div class="label">${x[1].count} ครั้ง</div></div><b>${x[1].dur} min</b></div>`).join('')||'<div class="empty">ไม่มีข้อมูล</div>'}</div>`}
+function typeSummary(rows){let m={};rows.forEach(x=>m[x.type]=(m[x.type]||0)+1);return Object.entries(m).map(x=>`<div class="rankrow"><div></div>${badge(x[0])}<b>${x[1]} ครั้ง</b></div>`).join('')||'<div class="empty">ไม่มีข้อมูล</div>'}
+function downtime(){let stopped=data.filter(x=>x.status==='Stopped'),under=data.filter(x=>x.status==='Underperforming');return `<div class="head"><div><h1>Downtime</h1><div class="sub">ติดตามเครื่องที่หยุด และเครื่องที่ยังทำงานแต่ประสิทธิภาพผิดปกติ</div></div><button class="btn primary" onclick="openModal()">➕ Report Issue</button></div>
+<div class="section"><div class="section-title">🛑 Stopped Machines <small>เครื่องที่หยุดอยู่ในขณะนี้</small></div><div class="table"><table><thead><tr><th>เครื่องจักร</th><th>Line</th><th>ประเภท</th><th>สาเหตุ</th><th>สถานะ</th><th>เริ่มหยุด</th><th>ผู้แจ้ง</th></tr></thead><tbody>${table(stopped)}</tbody></table></div></div>
+<div class="section"><div class="section-title">⚠️ Running but Underperforming <small>ยังทำงานอยู่ แต่ต้องติดตามประสิทธิภาพ</small></div><div class="table"><table><thead><tr><th>เครื่องจักร</th><th>Line</th><th>ประเภท</th><th>สาเหตุ</th><th>สถานะ</th><th>เวลาแจ้ง</th><th>ผู้แจ้ง</th></tr></thead><tbody>${table(under)}</tbody></table></div></div>`}
+function machines(){let names=[...new Set(data.map(x=>x.machine))];return `<div class="head"><div><h1>Machines</h1><div class="sub">รายการเครื่องจักรทั้งหมดในระบบ</div></div><button class="btn primary" onclick="alert('โครงสร้างพร้อมต่อฐานข้อมูลสำหรับเพิ่มเครื่องจักร')">+ เพิ่มเครื่องจักร · Add Machine</button></div><div class="table"><table><thead><tr><th>เครื่องจักร</th><th>Line</th><th>เหตุการณ์ทั้งหมด</th><th>Downtime รวม</th><th>การจัดการ</th></tr></thead><tbody>${names.map(n=>{let r=data.filter(x=>x.machine===n);return `<tr><td><b>${n}</b></td><td>${r[0]?.line||'-'}</td><td>${r.length}</td><td>${r.reduce((a,x)=>a+x.duration,0)} นาที</td><td><button class="btn secondary" onclick="alert('แก้ไขเครื่อง: ${n}')">แก้ไข</button></td></tr>`}).join('')||'<tr><td colspan="5" class="empty">ยังไม่มีเครื่องจักร</td></tr>'}</tbody></table></div>`}
+function statistics(){let f=filtered();let m={};f.forEach(x=>{m[x.machine]??={count:0,dur:0};m[x.machine].count++;m[x.machine].dur+=x.duration});let a=Object.entries(m).sort((a,b)=>rank==='count'?b[1].count-a[1].count:b[1].dur-a[1].dur);return `<div class="head"><div><h1>Statistics</h1><div class="sub">วิเคราะห์อันดับและรูปแบบ Downtime</div></div><div class="filters"><button class="filter ${rank==='count'?'active':''}" onclick="rank='count';render()">จำนวนครั้ง · Count</button><button class="filter ${rank==='duration'?'active':''}" onclick="rank='duration';render()">ระยะเวลา · Duration</button></div></div><div class="card"><div class="section-title">🏆 Ranking</div>${a.map((x,i)=>`<div class="rankrow"><b>#${i+1}</b><div><b>${x[0]}</b><div class="label">${x[1].count} ครั้ง</div></div><b>${x[1].dur} นาที</b></div>`).join('')||'<div class="empty">ไม่มีข้อมูล</div>'}</div>`}
+function history(){let f=filtered();return `<div class="head"><div><h1>History</h1><div class="sub">ประวัติเครื่องจักรหยุดทั้งหมด</div></div><button class="btn secondary" onclick="clearAll()">🔒 Clear All (Admin)</button></div><div class="section-head"><div class="filters"><button class="filter ${filter==='all'?'active':''}" onclick="filter='all';render()">ทั้งหมด</button><button class="filter ${filter==='today'?'active':''}" onclick="filter='today';render()">วันนี้</button><button class="filter ${filter==='month'?'active':''}" onclick="filter='month';render()">เดือนนี้</button><button class="filter ${filter==='year'?'active':''}" onclick="filter='year';render()">ปีนี้</button></div></div><div class="table"><table><thead><tr><th>เครื่องจักร</th><th>Line</th><th>ประเภท</th><th>สาเหตุ</th><th>ระยะเวลา</th><th>วันที่/เวลา</th><th>ผู้แจ้ง</th></tr></thead><tbody>${table(f,true)}</tbody></table></div>`}
+function settings(){return `<div class="head"><div><h1>Settings</h1><div class="sub">ตั้งค่าระบบและการเข้าถึงสำหรับผู้ดูแล</div></div></div><div class="setting">
+<div class="setting-item"><div><b>🔐 Admin Mode</b><small>สิทธิ์ผู้ดูแลระบบสำหรับจัดการข้อมูล</small></div><div class="toggle on"></div></div>
+<div class="setting-item"><div><b>📊 Dashboard Auto Refresh</b><small>อัปเดตข้อมูลบนหน้า Dashboard อัตโนมัติ</small></div><div class="toggle on"></div></div>
+<div class="setting-item"><div><b>💾 Local Data Storage</b><small>ข้อมูลตัวอย่างนี้จัดเก็บใน Browser ของเครื่องนี้</small></div><button class="btn secondary" onclick="clearAll()">ล้างข้อมูล</button></div>
+<div class="setting-item"><div><b>ℹ️ System Version</b><small>Machine Downtime Tracking System · Clean Industrial UI</small></div><b>v2.0</b></div></div>`}
+function goByName(p){current=p;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(p)));render()}
+function render(){let title={dashboard:'Dashboard',machines:'Machines',downtime:'Downtime',statistics:'Statistics',history:'History',settings:'Settings'}[current];$('topTitle').textContent=title;$('app').innerHTML=current==='dashboard'?dashboard():current==='machines'?machines():current==='downtime'?downtime():current==='statistics'?statistics():current==='history'?history():settings()}
+render();
+</script>
+</body></html>
